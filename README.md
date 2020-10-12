@@ -21,7 +21,7 @@ Les NOTAM (Notice To Air Men) sont des messages produits par les services de la 
 
 En France, ces messages sont publiés sur le site officiel suivant : http://notamweb.aviation-civile.gouv.fr/
 
-Le site officiel est plutôt ancien et ne propose aucune API de récupération des données. Pour récupérer les NOTAMs il est donc nécessaire de "crawleré le site pour en extraire les données.
+Le site officiel est plutôt ancien et ne propose aucune API de récupération des données. Pour récupérer les NOTAMs il est donc nécessaire de "crawler" le site pour en extraire les données.
 
 Un formulaire permet de récupérer les NOTAM par FIR (Flight Information Region, il y en a 5 en France : LFBB, LFEE, LFFF, LFMM et LFRR) en précisant certain critères (durée, IFR/VFR, Flight Level min et max, FIR concernées, ...). Le but est d'utiliser ce formulaire pour récupérer un ensemble de NOTAM de manière programmatique.
 
@@ -31,11 +31,11 @@ Il n'y a pas de piège et l'ensemble des recettes nécessaires à la réalisatio
 
 ## Le challenge
 
-Le programme doit récupérer et afficher les NOTAM des **12 prochaines heures** pour la **FIR LFBB** depuis NOTAM-Web et afficher le code du NOTAM et le **champ Q** dans la console puis se stopper proprement le programme.
+Le programme doit récupérer et afficher les NOTAM des **12 prochaines heures** pour la **FIR LFBB** depuis NOTAM-Web et afficher le code du NOTAM et le **champ Q** dans la console puis de stopper proprement le programme.
 
-Chaque NOTAM ne devra être affichée qu’une seul fois par exécution.
+Chaque NOTAM ne devra être affichée qu’une seule fois par exécution.
 
-Comme le site NOTAM-Web est relativement instable et retourne aléatoirement une erreur quand les requêtes ont faites en mode `COMPLET` vous devrez réaliser `1+n` requête(s). 
+Comme le site NOTAM-Web est relativement instable et retourne aléatoirement une erreur quand les requêtes sont faites en mode `COMPLET` vous devrez réaliser `1+n` requête(s). 
 La première requête permet de lister les NOTAMs disponibles et les requêtes suivantes permettent de récupérer le détail de chaque NOTAM.
 
 ### Lister les NOTAMs
@@ -72,16 +72,51 @@ Aide sur CURL : https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 
 ### Parser le résultat
 
-Une fois la requête exécutée vous obtenez le résultat sous la forme d’une page HTML qu’il va falloir parser pour extraire une liste manipulable des identifiants de NOTAM à récupérer individuellement à l’étape suivante. 
+Une fois la requête exécutée vous obtenez le résultat sous la forme d’une page HTML qu’il va falloir parser pour extraire une liste manipulable des identifiants de NOTAM à récupérer individuellement à l’étape suivante.
 Plusieurs stratégies sont possibles pour parser la page mais nous vous recommandons de faire simple et de vous contenter de manipulation de chaîne et/ou d’expressions régulières.
 
 ### Récupérer le détail d’une NOTAM
 
-Pour chaque identifiant de NOTAM récupéré précédemment vous devez récupérer le détail avec la requête suivante :
+L'identifiant d'un NOTAM est structuré de la manière suivante:
+ex: LFFA-R2415/20
+* LFFA : code du bureau international des NOTAM (= LFFA pour la France)
+* R : série (catégorie) du NOTAM
+* 2415 : numéro du NOTAM dans sa série
+* 20 : Année en 2 digit (2020)
+
+Pour chaque identifiant de NOTAM récupéré précédemment vous devez récupérer le détail à l'aide de la structure de l'identifiant et de la requête suivante:
+```
+POST http://notamweb.aviation-civile.gouv.fr/Script/IHM/Bul_Notam.php?NOTAM_Langue=FR
+bResultat: true
+bImpression: 
+ModeAffichage: RESUME
+NOTAM_Langue: FR
+NOTAM_Mat_Notam[0][0]: LFFA
+NOTAM_Mat_Notam[0][1]: R
+NOTAM_Mat_Notam[0][2]: 2415
+NOTAM_Mat_Notam[0][3]: 20
+NOTAM_Mat_Notam[1][0]: optionel
+NOTAM_Mat_Notam[1][1]: optionel
+NOTAM_Mat_Notam[1][2]: optionel
+NOTAM_Mat_Notam[1][3]: optionel
+.
+.
+.
+NOTAM_Mat_Notam[10][0]: optionel
+NOTAM_Mat_Notam[10][1]: optionel
+NOTAM_Mat_Notam[10][2]: optionel
+NOTAM_Mat_Notam[10][3]: optionel
 
 ```
-@todo
+
+Vous pouvez tester la requête avec l'éxécutable `curl` :
+
+```bash
+$ curl -F 'bResultat=true' -F 'ModeAffichage=RESUME' -F 'NOTAM_Mat_Notam[0][0]=LFFA' -F 'NOTAM_Mat_Notam[0][1]=R' -F 'NOTAM_Mat_Notam[0][2]=2415' -F 'NOTAM_Mat_Notam[0][3]=20' -X POST http://notamweb.aviation-civile.gouv.fr/Script/IHM/Bul_Notam.php?NOTAM_Langue=FR
+
+> <HTML><HEAD><TITLE>(R&eacute;sultat)BULLETIN NOTAM NOMMES (Fran&ccedil;ais)</TITLE> ...
 ```
+
 
 De même que pour la liste vous devrez parser le résultat pour obtenir le champ **Q**.
 
