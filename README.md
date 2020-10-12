@@ -140,7 +140,7 @@ $ javac src/main/java/*.java
 $ java -cp src/main/java/ NotamCrawler
 ```
 
-Vous verrez que le dépôt actuel, une fois cloner propose déjà un squellete de code éxécutable qui affiche la sortie suivante, cela vous permet de tester votre environnement avant de démarrer :
+Vous verrez que le dépôt actuel, une fois cloné propose déjà un squellete de code éxécutable qui affiche la sortie suivante, cela vous permet de tester votre environnement avant de démarrer :
 
 ```bash
 > Ready to implement!
@@ -150,7 +150,7 @@ A vous d’implémenter votre programme à partir du fichier `src/main/java/Nota
 
 ## Bonus
 
-Si vous en avez la motivation vous pouvez aller une peu plus loin en réalisant un ou plusieurs objectifs bonus :
+Si vous en avez la motivation vous pouvez aller un peu plus loin en réalisant un ou plusieurs objectifs bonus :
 
 * Ajouter une option à la ligne de commande pour choisir entre la récupération de la liste des NOTAMs décrite ci-avant ou la récupération et l’affichage d’une NOTAM précise par son identifiant passé en argument de la ligne de commande
 * Enregistrer pour chaque NOTAM son code et tous ses champs (Q, A, B, D, E, F, G) dans un fichier CSV
